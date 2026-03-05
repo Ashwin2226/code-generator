@@ -2,246 +2,154 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Target Code Generator | Ashwin</title>
+    <title>Compiler Chat — Ashwin</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <style>
         :root {
-            --bg: #0f172a;
-            --card: rgba(30, 41, 59, 0.7);
-            --border: rgba(51, 65, 85, 0.5);
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.2);
-            --text-main: #f1f5f9;
-            --text-dim: #94a3b8;
-            --success: #4ade80;
+            --wa-bg: #0b141a;
+            --wa-header: #202c33;
+            --wa-teal: #00a884;
+            --wa-bubble-out: #005c4b;
+            --wa-bubble-in: #202c33;
+            --wa-text: #e9edef;
+            --wa-muted: #8696a0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--wa-bg); color: var(--wa-text); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; }
 
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 40px 20px;
-            line-height: 1.5;
+        /* Header Styling */
+        header { 
+            background: var(--wa-header); padding: 10px 20px; 
+            display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
+        .profile-pic { width: 40px; height: 40px; border-radius: 50%; background: var(--wa-muted); margin-right: 15px; }
+        .header-info h1 { font-size: 16px; font-weight: 600; }
+        .header-info p { font-size: 12px; color: var(--wa-teal); }
+
+        /* Layout Grid */
+        .chat-container { flex: 1; display: grid; grid-template-columns: 450px 1fr; overflow: hidden; }
+
+        /* Sidebar / Editor */
+        .editor-side { background: #111b21; border-right: 1px solid #222d34; padding: 20px; display: flex; flex-direction: column; }
+        .label { color: var(--wa-teal); font-size: 12px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+        textarea { 
+            flex: 1; background: #2a3942; border: none; border-radius: 10px; color: white; 
+            padding: 15px; font-family: 'Consolas', monospace; resize: none; outline: none;
+        }
+        .btn-send { 
+            background: var(--wa-teal); border: none; padding: 12px; border-radius: 8px; 
+            color: #0b141a; font-weight: 700; margin-top: 15px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-send:hover { opacity: 0.9; transform: scale(0.98); }
+
+        /* Chat Side / Output */
+        .output-side { 
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); 
+            background-size: contain; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
+        .bubble { 
+            max-width: 85%; padding: 10px 15px; border-radius: 10px; position: relative; font-size: 14px; line-height: 1.4;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
         }
+        .bubble.in { background: var(--wa-bubble-in); align-self: flex-start; border-top-left-radius: 0; }
+        .bubble.out { background: var(--wa-bubble-out); align-self: flex-end; border-top-right-radius: 0; color: #e9edef; }
+        .bubble-header { color: var(--wa-teal); font-size: 11px; font-weight: 700; margin-bottom: 5px; }
 
-        .logo-pill {
-            display: inline-block;
-            padding: 6px 16px;
-            background: var(--accent-glow);
-            border: 1px solid var(--accent);
-            border-radius: 999px;
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
+        /* Table inside Chat */
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        td { padding: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+        .code-block { font-family: 'Consolas', monospace; white-space: pre; font-size: 13px; }
+
+        footer { 
+            background: var(--wa-header); padding: 15px 30px; border-top: 1px solid #222d34;
+            display: flex; justify-content: space-between; align-items: center; color: var(--wa-muted); font-size: 13px;
         }
-
-        h1 { font-size: 32px; letter-spacing: -1px; margin-bottom: 8px; }
-        .subtitle { color: var(--text-dim); font-size: 16px; }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-
-        .glass-card {
-            background: var(--card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }
-
-        .label {
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        textarea {
-            width: 100%;
-            height: 380px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: #e2e8f0;
-            padding: 16px;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 13px;
-            outline: none;
-            resize: none;
-            transition: 0.3s;
-        }
-
-        textarea:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-
-        .btn-row { display: flex; gap: 12px; margin-top: 20px; }
-        
-        .btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-            border: none;
-        }
-
-        .btn-primary { background: var(--accent); color: #0f172a; box-shadow: 0 4px 14px var(--accent-glow); }
-        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
-
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
-        .btn-outline:hover { color: white; border-color: white; }
-
-        /* Output Tabs */
-        .tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-        .tab { 
-            padding-bottom: 10px; cursor: pointer; color: var(--text-dim); 
-            font-size: 14px; font-weight: 600; border-bottom: 2px solid transparent; 
-        }
-        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-        .output-box {
-            height: 380px;
-            background: rgba(15, 23, 42, 0.8);
-            border-radius: 12px;
-            padding: 16px;
-            overflow-y: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-        }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: var(--text-dim); padding: 8px; border-bottom: 1px solid var(--border); font-size: 11px; }
-        td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        .keyword { color: #f472b6; }
-        .identifier { color: #38bdf8; }
-        .operator { color: #fbbf24; }
-
-        footer {
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-dim);
-            font-size: 14px;
-        }
-
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <div class="logo-pill">Compiler Lab Simulation</div>
-        <h1>Target Code Generation</h1>
-        <p class="subtitle">Processing source code into optimized assembly instructions</p>
-    </header>
+<header>
+    <div class="profile-pic"></div>
+    <div class="header-info">
+        <h1>Compiler Project Group</h1>
+        <p>online (Ashwin & System)</p>
+    </div>
+</header>
 
-    <div class="main-grid">
-        <div class="glass-card">
-            <span class="label">Source Editor</span>
-            <textarea id="codeInput" spellcheck="false">#include <stdio.h>
-
-int main() {
+<div class="chat-container">
+    <div class="editor-side">
+        <span class="label">Type Source Code</span>
+        <textarea id="codeInput" spellcheck="false">int main() {
     int x = 10;
     int y = 20;
     int sum = x + y;
     return 0;
 }</textarea>
-            <div class="btn-row">
-                <button class="btn btn-primary" onclick="simulate()">Generate Target Code</button>
-                <button class="btn btn-outline" onclick="reset()">Reset</button>
-            </div>
-        </div>
-
-        <div class="glass-card">
-            <div class="tabs">
-                <div class="tab active" id="tabTokens" onclick="showPanel('tokens')">Lexical Tokens</div>
-                <div class="tab" id="tabTac" onclick="showPanel('tac')">Intermediate (TAC)</div>
-                <div class="tab" id="tabAsm" onclick="showPanel('asm')">Target ASM</div>
-            </div>
-
-            <div id="panel-tokens" class="output-box">
-                <table>
-                    <thead><tr><th>LEXEME</th><th>TOKEN TYPE</th></tr></thead>
-                    <tbody id="tokenTable"></tbody>
-                </table>
-            </div>
-
-            <div id="panel-tac" class="output-box hidden" style="color: var(--success); white-space: pre;"></div>
-            
-            <div id="panel-asm" class="output-box hidden" style="color: #fbbf24; white-space: pre;"></div>
-        </div>
+        <button class="btn-send" onclick="simulateCompilation()">Run Simulation</button>
     </div>
 
-    <footer>
-        <div>Student Name: <strong>Ashwin</strong></div>
-        <div>Registration Number: <strong>RA2311003050382</strong></div>
-    </footer>
+    <div class="output-side" id="chatHistory">
+        <div class="bubble in">
+            <div class="bubble-header">SYSTEM</div>
+            Hello Ashwin! Paste your C code and click "Run" to generate the target code.
+        </div>
+    </div>
 </div>
 
+<footer>
+    <div>Student: <strong>Ashwin</strong></div>
+    <div>Registration: <strong>RA2311003050382</strong></div>
+</footer>
+
 <script>
-    function showPanel(id) {
-        document.querySelectorAll('.output-box').forEach(el => el.classList.add('hidden'));
-        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-        document.getElementById('panel-' + id).classList.remove('hidden');
-        document.getElementById('tab' + id.charAt(0).toUpperCase() + id.slice(1)).classList.add('active');
-    }
-
-    function simulate() {
+    function simulateCompilation() {
         const input = document.getElementById('codeInput').value;
-        const table = document.getElementById('tokenTable');
-        const tacPanel = document.getElementById('panel-tac');
-        const asmPanel = document.getElementById('panel-asm');
+        const chat = document.getElementById('chatHistory');
 
-        // Lexical Analysis Simulation
-        table.innerHTML = "";
+        // 1. User "Sent" Code
+        chat.innerHTML += `
+            <div class="bubble out">
+                <div class="bubble-header">YOU</div>
+                Requested compilation for: <br><i>${input.substring(0, 30)}...</i>
+            </div>
+        `;
+
+        // 2. System "Replied" with Tokens
+        let tokenRows = "";
         const words = input.match(/\w+|[=+*/-]|[();{}]/g);
-        const keywords = ['int', 'float', 'return', 'include', 'main', 'if'];
-
-        words.forEach(word => {
-            let type = "IDENTIFIER";
-            if (keywords.includes(word)) type = "KEYWORD";
-            else if (/\d+/.test(word)) type = "CONSTANT";
-            else if (/[=+*/-]/.test(word)) type = "OPERATOR";
-            else if (/[(){};]/.test(word)) type = "SPECIAL SYMBOL";
-
-            table.innerHTML += `<tr><td class="identifier">${word}</td><td><small>${type}</small></td></tr>`;
+        words.slice(0, 8).forEach(w => {
+            tokenRows += `<tr><td>${w}</td><td style="color:var(--wa-teal)">TOKEN</td></tr>`;
         });
 
-        // TAC Simulation
-        tacPanel.innerText = `t1 = x + y\nsum = t1\nreturn 0`;
+        setTimeout(() => {
+            chat.innerHTML += `
+                <div class="bubble in">
+                    <div class="bubble-header">LEXICAL ANALYZER</div>
+                    Tokens Generated:
+                    <table>${tokenRows}</table>
+                </div>
+            `;
+            chat.scrollTop = chat.scrollHeight;
+        }, 500);
 
-        // ASM Simulation
-        asmPanel.innerText = `MOV EAX, [x]\nADD EAX, [y]\nMOV [sum], EAX\nRET`;
-        
-        showPanel('tokens');
-    }
-
-    function reset() {
-        location.reload();
+        // 3. System "Replied" with ASM
+        setTimeout(() => {
+            chat.innerHTML += `
+                <div class="bubble in">
+                    <div class="bubble-header">CODE GENERATOR</div>
+                    Target Assembly:<br>
+                    <div class="code-block" style="color:#fbbf24">
+MOV EAX, [x]
+ADD EAX, [y]
+MOV [sum], EAX
+RET</div>
+                </div>
+            `;
+            chat.scrollTop = chat.scrollHeight;
+        }, 1200);
     }
 </script>
 
