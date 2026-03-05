@@ -1,156 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Target Code Gen — Ashwin</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-    :root {
-        --bg: #020617;
-        --panel: #1e293b;
-        --accent: #06b6d4;
-        --accent-glow: rgba(6, 182, 212, 0.3);
-        --text-main: #f8fafc;
-        --text-dim: #94a3b8;
-    }
-    body {
-        margin: 0; padding: 20px;
-        background-color: var(--bg);
-        color: var(--text-main);
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    }
-    .container { max-width: 1400px; margin: 0 auto; }
-    header { 
-        display: flex; justify-content: space-between; align-items: center;
-        padding-bottom: 20px; border-bottom: 1px solid #334155; margin-bottom: 30px;
-    }
-    .brand { font-size: 24px; font-weight: 800; letter-spacing: -1px; background: linear-gradient(to right, #06b6d4, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    
-    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-    .card { 
-        background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; 
-        padding: 24px; position: relative; overflow: hidden;
-    }
-    .card-label { font-size: 12px; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 15px; display: block; }
-    
-    textarea {
-        width: 100%; height: 400px; background: #020617; border: 1px solid #334155;
-        border-radius: 12px; color: #e2e8f0; padding: 15px; font-family: 'JetBrains Mono', monospace;
-        font-size: 14px; outline: none; transition: 0.3s;
-    }
-    textarea:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+    <meta charset="utf-8">
+    <title>Target Code Generator | Ashwin</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: rgba(30, 41, 59, 0.7);
+            --border: rgba(51, 65, 85, 0.5);
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.2);
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --success: #4ade80;
+        }
 
-    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-    .btn-main { 
-        background: var(--accent); color: #000; border: none; padding: 12px 24px; 
-        border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;
-    }
-    .btn-main:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .tabs { display: flex; border-bottom: 1px solid #334155; margin-bottom: 20px; }
-    .tab { 
-        padding: 10px 20px; cursor: pointer; color: var(--text-dim); border-bottom: 2px solid transparent; 
-        font-weight: 600; font-size: 14px;
-    }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
 
-    /* Results Table styling */
-    .results-area { height: 400px; overflow-y: auto; background: #020617; border-radius: 12px; padding: 10px; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; color: var(--text-dim); padding: 10px; border-bottom: 1px solid #1e293b; }
-    td { padding: 10px; border-bottom: 1px solid #0f172a; color: #cbd5e1; }
-    
-    footer {
-        margin-top: 40px; padding: 20px; border-top: 1px solid #1e293b;
-        display: flex; justify-content: space-between; color: var(--text-dim); font-size: 14px;
-    }
-    .hidden { display: none; }
-    .badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; }
-</style>
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-pill {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--accent-glow);
+            border: 1px solid var(--accent);
+            border-radius: 999px;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        h1 { font-size: 32px; letter-spacing: -1px; margin-bottom: 8px; }
+        .subtitle { color: var(--text-dim); font-size: 16px; }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .glass-card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            height: 380px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #e2e8f0;
+            padding: 16px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            outline: none;
+            resize: none;
+            transition: 0.3s;
+        }
+
+        textarea:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+
+        .btn-row { display: flex; gap: 12px; margin-top: 20px; }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+        }
+
+        .btn-primary { background: var(--accent); color: #0f172a; box-shadow: 0 4px 14px var(--accent-glow); }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+        .btn-outline:hover { color: white; border-color: white; }
+
+        /* Output Tabs */
+        .tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .tab { 
+            padding-bottom: 10px; cursor: pointer; color: var(--text-dim); 
+            font-size: 14px; font-weight: 600; border-bottom: 2px solid transparent; 
+        }
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        .output-box {
+            height: 380px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 16px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--text-dim); padding: 8px; border-bottom: 1px solid var(--border); font-size: 11px; }
+        td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .keyword { color: #f472b6; }
+        .identifier { color: #38bdf8; }
+        .operator { color: #fbbf24; }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div class="brand">PROX-GEN COMPILER</div>
-        <div id="status" style="font-size: 13px; color: var(--text-dim);">System Ready</div>
+        <div class="logo-pill">Compiler Lab Simulation</div>
+        <h1>Target Code Generation</h1>
+        <p class="subtitle">Processing source code into optimized assembly instructions</p>
     </header>
 
-    <div class="layout">
-        <div class="card">
-            <span class="card-label">Input Source Code</span>
-            <textarea id="code" spellcheck="false">int main() {
-    int a = 5;
-    int b = 10;
-    int c = a + b;
-    return c;
+    <div class="main-grid">
+        <div class="glass-card">
+            <span class="label">Source Editor</span>
+            <textarea id="codeInput" spellcheck="false">#include <stdio.h>
+
+int main() {
+    int x = 10;
+    int y = 20;
+    int sum = x + y;
+    return 0;
 }</textarea>
-            <div class="btn-group">
-                <button class="btn-main" onclick="process()">Compile & Generate</button>
-                <button style="background:transparent; color:white; border:1px solid #334155; padding:10px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('code').value=''">Clear</button>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="simulate()">Generate Target Code</button>
+                <button class="btn btn-outline" onclick="reset()">Reset</button>
             </div>
         </div>
 
-        <div class="card">
+        <div class="glass-card">
             <div class="tabs">
-                <div class="tab active" onclick="switchTab(event, 'tokens')">Tokens</div>
-                <div class="tab" onclick="switchTab(event, 'tac')">Intermediate (TAC)</div>
-                <div class="tab" onclick="switchTab(event, 'asm')">Target ASM</div>
+                <div class="tab active" id="tabTokens" onclick="showPanel('tokens')">Lexical Tokens</div>
+                <div class="tab" id="tabTac" onclick="showPanel('tac')">Intermediate (TAC)</div>
+                <div class="tab" id="tabAsm" onclick="showPanel('asm')">Target ASM</div>
             </div>
-            
-            <div id="tokens" class="results-area">
+
+            <div id="panel-tokens" class="output-box">
                 <table>
-                    <thead><tr><th>#</th><th>Type</th><th>Lexeme</th></tr></thead>
-                    <tbody id="token-body"></tbody>
+                    <thead><tr><th>LEXEME</th><th>TOKEN TYPE</th></tr></thead>
+                    <tbody id="tokenTable"></tbody>
                 </table>
             </div>
 
-            <div id="tac" class="results-area hidden" style="font-family: monospace; white-space: pre; padding: 20px; color: #10b981;"></div>
+            <div id="panel-tac" class="output-box hidden" style="color: var(--success); white-space: pre;"></div>
             
-            <div id="asm" class="results-area hidden" style="font-family: monospace; white-space: pre; padding: 20px; color: #f59e0b;"></div>
+            <div id="panel-asm" class="output-box hidden" style="color: #fbbf24; white-space: pre;"></div>
         </div>
     </div>
 
     <footer>
-        <div>Student: <strong>Ashwin</strong></div>
-        <div>Reg No: <strong>RA2311003050382</strong></div>
+        <div>Student Name: <strong>Ashwin</strong></div>
+        <div>Registration Number: <strong>RA2311003050382</strong></div>
     </footer>
 </div>
 
 <script>
-    function switchTab(evt, tabName) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.results-area').forEach(r => r.classList.add('hidden'));
-        evt.currentTarget.classList.add('active');
-        document.getElementById(tabName).classList.remove('hidden');
+    function showPanel(id) {
+        document.querySelectorAll('.output-box').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.getElementById('panel-' + id).classList.remove('hidden');
+        document.getElementById('tab' + id.charAt(0).toUpperCase() + id.slice(1)).classList.add('active');
     }
 
-    function process() {
-        const code = document.getElementById('code').value;
-        const tokenBody = document.getElementById('token-body');
-        const tacArea = document.getElementById('tac');
-        const asmArea = document.getElementById('asm');
-        
-        // Simulating the Lexical Analysis
-        const lines = code.split('\n');
-        tokenBody.innerHTML = "";
-        let count = 1;
-        
-        // Basic keywords for simulation
-        const keywords = ['int', 'float', 'return', 'if', 'else', 'while', 'main'];
-        
-        code.match(/\w+|[=+*/-]|[();{}]/g).forEach(val => {
-            let type = keywords.includes(val) ? "KEYWORD" : (/\d+/.test(val) ? "CONSTANT" : (/\w+/.test(val) ? "IDENTIFIER" : "OPERATOR"));
-            tokenBody.innerHTML += `<tr><td>${count++}</td><td><span class="badge" style="background:#1e293b">${type}</span></td><td>${val}</td></tr>`;
+    function simulate() {
+        const input = document.getElementById('codeInput').value;
+        const table = document.getElementById('tokenTable');
+        const tacPanel = document.getElementById('panel-tac');
+        const asmPanel = document.getElementById('panel-asm');
+
+        // Lexical Analysis Simulation
+        table.innerHTML = "";
+        const words = input.match(/\w+|[=+*/-]|[();{}]/g);
+        const keywords = ['int', 'float', 'return', 'include', 'main', 'if'];
+
+        words.forEach(word => {
+            let type = "IDENTIFIER";
+            if (keywords.includes(word)) type = "KEYWORD";
+            else if (/\d+/.test(word)) type = "CONSTANT";
+            else if (/[=+*/-]/.test(word)) type = "OPERATOR";
+            else if (/[(){};]/.test(word)) type = "SPECIAL SYMBOL";
+
+            table.innerHTML += `<tr><td class="identifier">${word}</td><td><small>${type}</small></td></tr>`;
         });
 
-        // Simulating TAC
-        tacArea.innerText = `t1 = a + b\nt2 = return t1`;
+        // TAC Simulation
+        tacPanel.innerText = `t1 = x + y\nsum = t1\nreturn 0`;
+
+        // ASM Simulation
+        asmPanel.innerText = `MOV EAX, [x]\nADD EAX, [y]\nMOV [sum], EAX\nRET`;
         
-        // Simulating Assembly
-        asmArea.innerText = `MOV EAX, [a]\nADD EAX, [b]\nMOV [c], EAX\nRET`;
-        
-        document.getElementById('status').innerText = "Compilation Successful";
+        showPanel('tokens');
+    }
+
+    function reset() {
+        location.reload();
     }
 </script>
 
